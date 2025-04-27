@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adaptive Math Trainer</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #eef2f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .trainer {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      width: 350px;
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 90%;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #feedback {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    #hint {
+      margin-top: 10px;
+      color: #555;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<div class="trainer">
+  <h2>Adaptive Math Trainer</h2>
+  <div id="prompt"></div>
+  <input type="text" id="userInput" placeholder="Type your answer">
+  <br>
+  <button onclick="submitAnswer()">Submit</button>
+  <div id="feedback"></div>
+  <div id="hint"></div>
+</div>
+
+<script>
+  let currentLevel = 'easy';
+  let correctStreak = 0;
+  let num1, num2, operator, answer;
+
+  function generateQuestion() {
+    if (currentLevel === 'easy') {
+      num1 = Math.floor(Math.random() * 10) + 1;
+      num2 = Math.floor(Math.random() * 10) + 1;
+      operator = ['+', '-'][Math.floor(Math.random() * 2)];
+    } else if (currentLevel === 'hard') {
+      num1 = Math.floor(Math.random() * 12) + 1;
+      num2 = Math.floor(Math.random() * 12) + 1;
+      operator = ['*', '/'][Math.floor(Math.random() * 2)];
+      if (operator === '/') {
+        num1 = num1 * num2;
+      }
+    }
+
+    answer = eval(`${num1} ${operator} ${num2}`);
+    document.getElementById('prompt').innerHTML = `What is: <b>${num1} ${operator} ${num2}</b>?`;
+    document.getElementById('userInput').value = "";
+    document.getElementById('feedback').innerHTML = "";
+    document.getElementById('hint').innerHTML = "";
+  }
+
+  function submitAnswer() {
+    const userAnswer = parseFloat(document.getElementById('userInput').value);
+
+    if (userAnswer === answer) {
+      correctStreak++;
+      document.getElementById('feedback').innerHTML = "✅ Correct! Well done!";
+      document.getElementById('hint').innerHTML = "";
+
+      if (correctStreak >= 3 && currentLevel === 'easy') {
+        currentLevel = 'hard';
+        correctStreak = 0;
+        alert("🎯 Great job! Moving to harder problems!");
+      }
+
+      generateQuestion();
+    } else {
+      correctStreak = 0;
+      document.getElementById('feedback').innerHTML = `❌ Incorrect. Try again!`;
+      document.getElementById('hint').innerHTML = `💡 Hint: ${getHint(operator)}`;
+    }
+  }
+
+  function getHint(op) {
+    if (op === '+') return 'Add the two numbers together';
+    if (op === '-') return 'Subtract the second number from the first';
+    if (op === '*') return 'Multiply the two numbers';
+    if (op === '/') return 'Divide the first number by the second';
+  }
+
+  generateQuestion();
+</script>
+
+</body>
+</html>
